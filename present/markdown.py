@@ -52,11 +52,14 @@ class Markdown(object):
 
             try:
                 if obj["type"] == "paragraph":
-                    images = [c for c in obj["children"] if c["type"] == "image"]
-                    not_images = [c for c in obj["children"] if c["type"] != "image"]
+                    images = [c for c in obj["children"]
+                              if c["type"] == "image"]
+                    not_images = [c for c in obj["children"]
+                                  if c["type"] != "image"]
 
                     for image in images:
-                        image["src"] = os.path.join(self.dirname, os.path.expanduser(image["src"]))
+                        image["src"] = os.path.join(
+                            self.dirname, os.path.expanduser(image["src"]))
 
                         if image["alt"] == "codio":
                             with open(image["src"], "r") as f:
@@ -72,7 +75,8 @@ class Markdown(object):
                     Element = eval(element_name)
                     buffer.append(Element(obj=obj))
             except NameError:
-                warnings.warn(f"(Slide {sliden + 1}) {element_name} is not supported")
+                warnings.warn(
+                    f"(Slide {sliden + 1}) {element_name} is not supported")
 
             if i == len(ast) - 1:
                 slides.append(Slide(elements=buffer))
