@@ -1,3 +1,4 @@
+import orgparse
 import os
 from .slide import (
     Slide,
@@ -15,7 +16,6 @@ from .slide import (
     BlockHtml,
     BlockQuote,
 )
-import orgparse
 
 
 class OrgMode(object):
@@ -97,18 +97,23 @@ class OrgMode(object):
                     if "\n- " in t:
                         lines = t.split("\n")
                         text = []
+                        # iterates over the lines
                         for line in lines:
+                            # checks if it's part of a list
                             if line.strip().startswith("- "):
+                                # gets how many spaces there are, so that the level can be calculated
                                 spaces = line.split("-")[0]
                                 level = 0
                                 for i in range(len(spaces)):
                                     level = level + 0.5
                                 level = int(level + 1)
+                                # checks if we have to make a new list element, because the last one is not a list
                                 if (
                                     len(text) != 0
-                                    and type(text[len(text) - 1]) is not str
-                                    and text[len(text) - 1].get("type") == "list"
+                                    and type(text[-1]) is not str
+                                    and text[-1].get("type") == "list"
                                 ):
+                                    # if it's a item on another level, we have to append it differently, the markdown parsing lib is weird
                                     if level > 0:
                                         text[-1].get("children")[-1]['children'].append({
                                             "type": "list",
@@ -133,15 +138,13 @@ class OrgMode(object):
                                             ],
                                         }
                                     )
-                                # l.append(line)
                             else:
-                                # buffer.append(self.__text__(line))
                                 if (
                                     len(text) != 0
-                                    and text[len(text) - 1] != 0
-                                    and type(text[len(text) - 1]) is not dict
+                                    and text[-1] != 0
+                                    and type(text[-1]) is not dict
                                 ):
-                                    text[len(text) - 1] = text[len(text) - 1] + (
+                                    text[-1] = text[-1] + (
                                         "\n" + line
                                     )
                                 else:
@@ -157,7 +160,6 @@ class OrgMode(object):
                                 buffer.append(List(obj=element))
                     else:
                         buffer.append(self.__text__(t))
-            print(buffer)
             slides.append(Slide(elements=buffer))
             buffer = []
 
