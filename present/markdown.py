@@ -73,6 +73,7 @@ class Markdown(object):
                 else:
                     element_name = obj["type"].title().replace("_", "")
                     Element = eval(element_name)
+                    print(obj)
                     buffer.append(Element(obj=obj))
             except NameError:
                 warnings.warn(

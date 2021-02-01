@@ -103,10 +103,11 @@ class OrgMode(object):
                             if line.strip().startswith("- "):
                                 # gets how many spaces there are, so that the level can be calculated
                                 spaces = line.split("-")[0]
-                                level = 0
+                                level = 1
+                                # calculates level
                                 for i in range(len(spaces)):
                                     level = level + 0.5
-                                level = int(level + 1)
+                                level = int(level)
                                 # checks if we have to make a new list element, because the last one is not a list
                                 if (
                                     len(text) != 0
@@ -114,8 +115,13 @@ class OrgMode(object):
                                     and text[-1].get("type") == "list"
                                 ):
                                     # if it's a item on another level, we have to append it differently, the markdown parsing lib is weird
-                                    if level > 0:
-                                        text[-1].get("children")[-1]['children'].append({
+                                    #print(level, text)
+                                    if level >= 2:
+                                        child = text[-1]["children"][-1]['children']
+                                        for i in range(level - 1):
+                                            child = child[-1]['children'] #[-1]['children']
+                                        #print()
+                                        child.append({
                                             "type": "list",
                                             "children": [
                                                 self.__list__(line, level)
@@ -134,7 +140,7 @@ class OrgMode(object):
                                         {
                                             "type": "list",
                                             "children": [
-                                                self.__list__(line, level)
+                                                self.__list__(line, 1)
                                             ],
                                         }
                                     )
@@ -149,7 +155,7 @@ class OrgMode(object):
                                     )
                                 else:
                                     text.append(line)
-
+                        print(text)
                         for element in text:
                             if type(element) is str:
                                 buffer.append(self.__text__(element))
@@ -162,5 +168,4 @@ class OrgMode(object):
                         buffer.append(self.__text__(t))
             slides.append(Slide(elements=buffer))
             buffer = []
-
         return slides
